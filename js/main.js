@@ -1,87 +1,124 @@
-// active
+  document.addEventListener('DOMContentLoaded', () => {
+            
+            // ===================================
+            // 1. TIMELINE & MENU ANIMATIONS (NEW)
+            // ===================================
+            const items = document.querySelectorAll('.timeline-item');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.2 });
 
-var tablinks = document.getElementsByClassName("tab-links");
-var tabcontents = document.getElementsByClassName("tab-contents");
+            items.forEach(item => {
+                observer.observe(item);
+                item.addEventListener('mouseenter', () => item.classList.add('active'));
+                item.addEventListener('mouseleave', () => item.classList.remove('active'));
+            });
 
-function opentab(tabname) {
-    for (tablink of tablinks) {
-        tablink.classList.remove("active-link");
-    }
-    for (tabcontent of tabcontents) {
-        tabcontent.classList.remove("active-tab");
-    }
-    event.currentTarget.classList.add("active-link");
-    document.getElementById(tabname).classList.add("active-tab");
-}
+            // Mobile Menu
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
 
+            if(btn && menu){
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+                menu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                       menu.classList.add('hidden'); 
+                    });
+                });
+            }
 
+            // ===================================
+            // 2. REST OF THE SCRIPTS (PRESERVED)
+            // (Accordion, Skill Cards, Tabs)
+            // ===================================
 
-// mobile menu
+            // Accordion / Questions
+            const questions = document.querySelectorAll('.question');
+            questions.forEach(function (question) {
+                const btn = question.querySelector(".question-btn");
+                if(btn){
+                    btn.addEventListener("click", function () {
+                        questions.forEach(function (item) {
+                            if (item !== question) {
+                                item.classList.remove("show-text");
+                            }
+                        });
+                        question.classList.toggle("show-text");
+                    });
+                }
+            });
 
-var sideMenu = document.getElementById("sidemenu");
+            // Skill Cards Highlight Logic
+            const cards = document.querySelectorAll('.skill-card');
+            const highlightedTitle = document.getElementById('highlighted-title');
+            const highlightedDesc = document.getElementById('highlighted-desc');
+            const highlightedIcon = document.getElementById('highlighted-icon');
 
-function openmenu() {
-    sideMenu.style.right = "0";
-}
-function closemenu() {
-    sideMenu.style.right = "-200px";
-}
+            function setHighlighted(title, desc, iconHTML, cardEl) {
+                if (highlightedTitle) highlightedTitle.textContent = title;
+                if (highlightedDesc) highlightedDesc.textContent = desc;
+                if (highlightedIcon) highlightedIcon.innerHTML = iconHTML || '<i class="fa-solid fa-star"></i>';
 
+                cards.forEach(c => {
+                    c.classList.remove('ring-2', 'ring-[#f6c47e]', 'bg-[#3a3d42]');
+                    c.classList.add('bg-[#2b2d32]');
+                });
 
-//using selectors inside the element
+                if (cardEl) {
+                    cardEl.classList.remove('bg-[#2b2d32]');
+                    cardEl.classList.add('ring-2', 'ring-[#f6c47e]', 'bg-[#3a3d42]');
+                }
+            }
 
-const questions = document.querySelectorAll('.question');
-questions.forEach(function (question) {
-    // questions.log(question);
-    const btn = question.querySelector(".question-btn");
-    // console.log(btn);
-    btn.addEventListener("click", function () {
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    setHighlighted(
+                        card.getAttribute('data-title'),
+                        card.getAttribute('data-desc'),
+                        card.getAttribute('data-icon'),
+                        card
+                    );
+                });
+            });
 
-        questions.forEach(function (item) {
-            if (item !== question) {
-                item.classList.remove("show-text");
+            // Initialize default card if exists
+            const defaultCard = document.querySelector('.skill-card[data-title="HTML5"]') || cards[0];
+            if (defaultCard) {
+                setHighlighted(
+                    defaultCard.getAttribute('data-title'),
+                    defaultCard.getAttribute('data-desc'),
+                    defaultCard.getAttribute('data-icon'),
+                    defaultCard
+                );
+            }
+
+            // Filter Skills Logic
+            window.filterSkills = function(category, clickedBtn) {
+                const allCards = document.querySelectorAll('.skill-card');
+                allCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    if (category === 'all' || cardCategory === category) {
+                        card.classList.remove('hidden');
+                        card.style.opacity = '0';
+                        setTimeout(() => card.style.opacity = '1', 50);
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+                
+                // Note: Ensure tab buttons have class 'tab-btn'
+                const allBtns = document.querySelectorAll('.tab-btn');
+                allBtns.forEach(btn => {
+                    btn.className = "tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-[#2b2d32] text-gray-400 border border-gray-700 hover:border-[#f6c47e] hover:text-white cursor-pointer";
+                });
+                if (clickedBtn) {
+                    clickedBtn.className = "tab-btn active px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-[#f6c47e] text-gray-900 shadow-[0_0_15px_rgba(246,196,126,0.4)] hover:bg-[#f6c47e] cursor-pointer";
+                }
             }
         });
-
-        question.classList.toggle("show-text");
-    });
-});
-
-const cards = document.querySelectorAll('.skill-card');
-const highlighted = document.getElementById('highlighted');
-const highlightedTitle = document.getElementById('highlighted-title');
-const highlightedDesc = document.getElementById('highlighted-desc');
-const highlightedIcon = document.getElementById('highlighted-icon');
-
-// helper to set highlighted content
-function setHighlighted(title, desc, iconHTML, cardEl) {
-    highlightedTitle.textContent = title;
-    highlightedDesc.textContent = desc;
-    highlightedIcon.innerHTML = iconHTML || '<i class="fa-solid fa-star"></i>';
-
-    // toggle active class visually
-    cards.forEach(c => c.classList.remove('card-active', 'bg-[#e7c07a]'));
-    if (cardEl) {
-        cardEl.classList.add('card-active');
-    }
-}
-
-// attach click & keyboard support
-cards.forEach(card => {
-    card.addEventListener('click', () => {
-        setHighlighted(card.dataset.title, card.dataset.desc, card.dataset.icon, card);
-    });
-    card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setHighlighted(card.dataset.title, card.dataset.desc, card.dataset.icon, card);
-        }
-    });
-});
-
-// mark the Ubuntu card as active by default
-// find the card with data-title "Ubuntu" (case sensitive)
-const defaultCard = Array.from(cards).find(c => c.dataset.title === 'Ubuntu');
-if (defaultCard) {
-    setHighlighted(defaultCard.dataset.title, defaultCard.dataset.desc, defaultCard.dataset.icon, defaultCard);
-}
