@@ -486,6 +486,39 @@ form textarea:focus {
 }
 
 /* =========================================
+           3. COURSE CARD STYLES (NEW)
+           ========================================= */
+.course-card {
+	background: rgba(45, 45, 45, 0.5);
+	/* Semi-transparent background */
+	backdrop-filter: blur(10px);
+	/* Glassmorphism effect */
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	transition: all 0.4s ease;
+}
+
+/* Hover Effect: Lift up and Yellow Border Glow */
+.course-card:hover {
+	transform: translateY(-5px);
+	border-color: rgba(250, 204, 21, 0.5);
+	/* Yellow glow */
+	box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Icon Background Animation */
+.course-icon-box {
+	background: linear-gradient(135deg, #333 0%, #222 100%);
+	transition: all 0.4s ease;
+}
+
+.course-card:hover .course-icon-box {
+	background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+	/* Turns Yellow on Hover */
+	color: #1f1f1f;
+	/* Icon turns dark */
+}
+
+/* =========================================
            3. PORTFOLIO STYLES (NEW)
            ========================================= */
 .work-card {
